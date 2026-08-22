@@ -1,0 +1,8 @@
+{
+  "name": "Remix MediaTV Display",
+  "description": "App Display Informasi/Promosi dengan Dashboard Admin, dual monitor, dan manajemen konten.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
