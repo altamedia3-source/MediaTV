@@ -16,6 +16,15 @@ function DashboardContent() {
   const mediaCount = data.media?.length || 0;
   const textCount = data.texts?.length || 0;
 
+  const openTVWindow = () => {
+    // Open in a new standalone window (popup), sized appropriately
+    window.open(
+      `/display/${screenId}`,
+      `MediaTV_Display_${screenId}`,
+      'width=1280,height=720,menubar=no,toolbar=no,location=no,status=no,titlebar=no'
+    );
+  };
+
   return (
     <div className="h-screen bg-slate-950 font-sans text-slate-200 flex flex-col md:flex-row overflow-hidden">
       
@@ -29,9 +38,9 @@ function DashboardContent() {
           </h1>
           <p className="text-[10px] text-slate-400 font-medium uppercase tracking-wider">ID: {screenId}</p>
         </div>
-        <a href={`/display/${screenId}`} target="_blank" rel="noopener noreferrer" className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg text-xs font-bold transition-all shadow-lg shadow-emerald-900/30">
+        <button onClick={openTVWindow} className="flex items-center gap-1.5 bg-emerald-600 hover:bg-emerald-500 text-white py-1.5 px-3 rounded-lg text-xs font-bold transition-all shadow-lg shadow-emerald-900/30">
           <Play className="w-3.5 h-3.5" /> Buka TV
-        </a>
+        </button>
       </div>
 
       {/* Desktop Sidebar */}
@@ -41,9 +50,9 @@ function DashboardContent() {
             <Monitor className="w-5 h-5 text-blue-400" /> MediaTV
           </h1>
           <p className="text-xs text-slate-400 font-medium mt-1">Dashboard Layar: <span className="text-white uppercase">{screenId}</span></p>
-          <a href={`/display/${screenId}`} target="_blank" rel="noopener noreferrer" className="mt-4 w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 px-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/30">
+          <button onClick={openTVWindow} className="mt-4 w-full flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-500 text-white py-2.5 px-4 rounded-xl font-bold transition-all shadow-lg shadow-emerald-900/30">
             <Play className="w-4 h-4" /> Buka Layar TV
-          </a>
+          </button>
         </div>
         
         <nav className="flex-1 p-4 space-y-2 overflow-y-auto">
