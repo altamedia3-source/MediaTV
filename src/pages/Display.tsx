@@ -17,7 +17,8 @@ function DisplayContent() {
   const [tickerTexts, setTickerTexts] = useState<TextItem[]>([]);
   const [newsTexts, setNewsTexts] = useState<TextItem[]>([]);
   
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [playId, setPlayId] = useState(0);
+  const currentIndex = mediaList.length > 0 ? playId % mediaList.length : 0;
   const [currentMediaUrl, setCurrentMediaUrl] = useState<string>('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [needsInteraction, setNeedsInteraction] = useState(true);
@@ -102,7 +103,7 @@ function DisplayContent() {
       const isVideoType = media.type === 'video';
       if ((isVideoType && !settings.showVideo) || (media.type === 'image' && !settings.showImage)) {
         // Skip this one and try the next
-        setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+        setPlayId(prev => prev + 1);
         return;
       }
 
@@ -118,12 +119,12 @@ function DisplayContent() {
             } else {
               console.warn("Local file not found in IndexedDB:", fileId);
               // Skip to next if not found
-              setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+              setPlayId(prev => prev + 1);
               return;
             }
           } catch (e) {
             console.error("Error loading local file", e);
-            setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+            setPlayId(prev => prev + 1);
             return;
           }
         } else {
@@ -136,7 +137,7 @@ function DisplayContent() {
         // Schedule next play
         if (imageTimerRef.current) clearTimeout(imageTimerRef.current);
         imageTimerRef.current = setTimeout(() => {
-          setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+          setPlayId(prev => prev + 1);
         }, media.duration * 1000);
       }
     };
@@ -148,7 +149,7 @@ function DisplayContent() {
       if (imageTimerRef.current) clearTimeout(imageTimerRef.current);
       if (urlToRevoke && urlToRevoke.startsWith('blob:')) URL.revokeObjectURL(urlToRevoke);
     };
-  }, [currentIndex, isPlaying, mediaList, settings.showVideo, settings.showImage]);
+  }, [playId, isPlaying, mediaList, settings.showVideo, settings.showImage]);
 
 
   // Update Audio Output Device when settings change
@@ -360,17 +361,18 @@ function DisplayContent() {
                 className="w-full h-full absolute inset-0 flex items-center justify-center bg-black"
               >
                 <video
+                  key={playId}
                   ref={videoRef}
                   src={currentMediaUrl}
                   autoPlay
                   playsInline
                   className={`w-full h-full ${settings.mediaFit === 'cover' ? 'object-cover' : 'object-contain'}`}
                   onEnded={() => {
-                    setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+                    setPlayId(prev => prev + 1);
                   }}
                   onError={(e) => {
                     console.error("Video error:", e);
-                    setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+                    setPlayId(prev => prev + 1);
                   }}
                   onCanPlay={(e) => {
                     const videoElement = e.target as HTMLVideoElement;
