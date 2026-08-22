@@ -107,10 +107,28 @@ function DisplayContent() {
       }
 
       let url = '';
-      if (media.blob) {
-        url = URL.createObjectURL(media.blob);
-      } else if (media.externalUrl) {
-        url = media.externalUrl;
+      if (media.externalUrl) {
+        if (media.externalUrl.startsWith('localdb://')) {
+          try {
+            const fileId = media.externalUrl.replace('localdb://', '');
+            const { db } = await import('../db/db');
+            const localMedia = await db.localMedia.get(fileId);
+            if (localMedia && localMedia.file) {
+              url = URL.createObjectURL(localMedia.file);
+            } else {
+              console.warn("Local file not found in IndexedDB:", fileId);
+              // Skip to next if not found
+              setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+              return;
+            }
+          } catch (e) {
+            console.error("Error loading local file", e);
+            setCurrentIndex((prev) => (prev + 1) % mediaList.length);
+            return;
+          }
+        } else {
+          url = media.externalUrl;
+        }
       }
       setCurrentMediaUrl(url);
 

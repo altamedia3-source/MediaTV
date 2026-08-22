@@ -5,8 +5,6 @@ import { ScreenProvider, useScreenContext } from '../lib/ScreenContext';
 import { defaultSettings } from '../db/db';
 import { MediaItem, TextItem, AppSettings, TextType } from '../types';
 import { Settings, Image as ImageIcon, Video, FileText, Check, X, UploadCloud, Type, Palette, Monitor, Play, Edit2, Trash2, Layout, Clock, Navigation, MousePointerClick, AlignLeft, AlignCenter, AlignRight, Type as TypeIcon, Hash, CheckSquare, Eye, ExternalLink, ImageUp, Plus, Newspaper, HardDrive } from 'lucide-react';
-import { ref, uploadBytesResumable, getDownloadURL } from 'firebase/storage';
-import { storage } from '../lib/firebase';
 
 function DashboardContent() {
   const { screenId, data, loading, error, updateScreenData } = useScreenContext();
@@ -97,7 +95,6 @@ function MediaManager({ data, updateScreenData }: any) {
   const [linkName, setLinkName] = useState('');
   const [linkType, setLinkType] = useState<'video'|'image'>('video');
   const [uploading, setUploading] = useState(false);
-  const [uploadProgress, setUploadProgress] = useState(0);
 
   const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -108,31 +105,26 @@ function MediaManager({ data, updateScreenData }: any) {
     if (!linkName) setLinkName(file.name.split('.')[0]);
 
     setUploading(true);
-    setUploadProgress(0);
 
     try {
-      const storageRef = ref(storage, `screens/${data.id || 'default'}/media/${Date.now()}_${file.name}`);
-      const uploadTask = uploadBytesResumable(storageRef, file);
+      // Save directly to Local Browser IndexedDB
+      const fileId = `local_${Date.now()}_${Math.random().toString(36).substring(7)}`;
+      
+      // We need to import db from ../db/db (I will add it if it's missing, wait, I can just do it here)
+      const { db } = await import('../db/db');
+      
+      await db.localMedia.add({
+        id: fileId,
+        file: file,
+        name: file.name,
+        type: file.type
+      });
 
-      uploadTask.on('state_changed', 
-        (snapshot) => {
-          const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-          setUploadProgress(Math.round(progress));
-        },
-        (error) => {
-          console.error("Upload error", error);
-          setUploading(false);
-          alert("Gagal mengunggah: " + error.message);
-        },
-        async () => {
-          const downloadURL = await getDownloadURL(uploadTask.snapshot.ref);
-          setLinkUrl(downloadURL);
-          setUploading(false);
-        }
-      );
+      setLinkUrl(`localdb://${fileId}`);
+      setUploading(false);
     } catch (e: any) {
       setUploading(false);
-      alert("Error: " + e.message);
+      alert("Error saving local file: " + e.message);
     }
   };
 
@@ -164,6 +156,13 @@ function MediaManager({ data, updateScreenData }: any) {
   };
 
   const remove = async (id: number) => {
+    const itemToRemove = media.find((m: any) => m.id === id);
+    if (itemToRemove?.externalUrl?.startsWith('localdb://')) {
+      const fileId = itemToRemove.externalUrl.replace('localdb://', '');
+      import('../db/db').then(({ db }) => {
+        db.localMedia.delete(fileId).catch(console.error);
+      });
+    }
     const newList = media.filter((m: any) => m.id !== id).map((m: any, i: number) => ({ ...m, order: i }));
     await updateScreenData({ media: newList });
   };
@@ -186,16 +185,16 @@ function MediaManager({ data, updateScreenData }: any) {
           <input type="text" placeholder="Nama (Opsional)" value={linkName} onChange={e => setLinkName(e.target.value)} className="bg-slate-900 border border-slate-700 text-white rounded-lg p-3 outline-none focus:border-blue-500" />
           <div className="flex-1 flex gap-2">
             <input type="url" placeholder="URL Media (http://... atau URL Lokal 192.168.x.x)" value={linkUrl} onChange={e => setLinkUrl(e.target.value)} className="bg-slate-900 border border-slate-700 text-white rounded-lg p-3 flex-1 outline-none focus:border-blue-500" />
-            <label className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-3 rounded-lg cursor-pointer transition-colors flex items-center gap-2 border border-slate-700" title="Upload dari Komputer (tanpa XAMPP)">
-              <UploadCloud className="w-5 h-5" />
+            <label className="bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold px-4 py-3 rounded-lg cursor-pointer transition-colors flex items-center gap-2 border border-slate-700" title="Simpan file ke browser lokal (Tanpa Kuota)">
+              <HardDrive className="w-5 h-5" />
               <input type="file" accept="video/*,image/*" onChange={handleFileUpload} className="hidden" disabled={uploading} />
             </label>
           </div>
           <button onClick={handleAdd} disabled={!linkUrl || uploading} className="bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold px-6 py-3 rounded-lg transition-all flex items-center justify-center min-w-[100px]">
-            {uploading ? `${uploadProgress}%` : 'Tambah'}
+            {uploading ? 'Memuat...' : 'Tambah'}
           </button>
         </div>
-        <p className="text-xs text-slate-400 mb-6 italic px-1 flex items-center gap-1.5"><HardDrive className="w-3.5 h-3.5" /> <span>Pilih ikon Upload (awan) untuk unggah dari komputer, atau ketik manual URL file dari XAMPP/Python.</span></p>
+        <p className="text-xs text-slate-400 mb-6 italic px-1 flex items-center gap-1.5"><HardDrive className="w-3.5 h-3.5" /> <span>Pilih ikon Folder untuk simpan media ke memori lokal browser (No Internet), atau ketik manual URL file dari XAMPP/Python.</span></p>
 
         <div className="space-y-3">
           {media.length === 0 && <div className="text-center p-8 text-slate-500 italic bg-slate-950/30 rounded-xl border border-slate-800/50">Belum ada media. Tambahkan URL media di atas.</div>}

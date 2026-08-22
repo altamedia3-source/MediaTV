@@ -1,16 +1,28 @@
 import Dexie, { type EntityTable } from 'dexie';
 import { MediaItem, TextItem, AppSettings } from '../types';
 
+export interface LocalMediaFile {
+  id: string;
+  file: Blob;
+  name: string;
+  type: string;
+}
+
 const db = new Dexie('MediaTVDatabase') as Dexie & {
   media: EntityTable<MediaItem, 'id'>;
   texts: EntityTable<TextItem, 'id'>;
   settings: EntityTable<AppSettings, 'id'>;
+  localMedia: EntityTable<LocalMediaFile, 'id'>;
 };
 
 db.version(1).stores({
   media: '++id, type, name, order, active',
   texts: '++id, type, active, order',
   settings: 'id'
+});
+
+db.version(2).stores({
+  localMedia: 'id'
 });
 
 export const defaultSettings: AppSettings = {
