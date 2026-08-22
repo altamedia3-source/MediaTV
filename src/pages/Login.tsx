@@ -3,6 +3,7 @@ import { useNavigate, Link } from 'react-router';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../lib/firebase';
 import { LampIllustration } from "../components/LampIllustration";
+import { StudioBackground } from "../components/StudioBackground";
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -48,7 +49,9 @@ export default function Login() {
   };
 
   return (
-    <div className={`min-h-screen flex items-center justify-center p-4 font-sans overflow-hidden transition-colors duration-1000 ease-in-out ${isLightOn ? 'bg-[#121212]' : 'bg-[#050505]'}`}>
+    <div className="min-h-screen flex items-center justify-center p-4 font-sans overflow-hidden relative bg-black">
+      <StudioBackground isLightOn={isLightOn} />
+
       <div className="flex flex-col md:flex-row items-center gap-12 md:gap-24 w-full max-w-5xl justify-center relative z-10">
         
         {/* Left Side: Lamp Image */}
@@ -58,9 +61,9 @@ export default function Login() {
 
         {/* Right Side: Login Card */}
         <div 
-          className={`relative p-10 rounded-[32px] w-full max-w-md backdrop-blur-xl transition-all duration-1000 ease-in-out ${
+          className={`relative p-10 rounded-[32px] w-full max-w-md backdrop-blur-2xl backdrop-saturate-150 transition-all duration-1000 ease-in-out ${
             isLightOn 
-            ? 'opacity-100 translate-y-0 bg-[#1c1c1c]/90 border border-white/5 border-t-white/10 border-l-yellow-500/20 shadow-[0_30px_60px_rgba(0,0,0,0.6),-20px_0_60px_rgba(253,230,138,0.05)]' 
+            ? 'opacity-100 translate-y-0 bg-[#16161a]/60 border border-white/10 border-t-white/20 border-l-yellow-500/30 shadow-[0_30px_60px_rgba(0,0,0,0.8),-20px_0_60px_rgba(253,230,138,0.08)]' 
             : 'opacity-0 translate-y-8 pointer-events-none blur-md bg-[#111111]/80 border border-white/5'
           }`}
         >
@@ -108,7 +111,7 @@ export default function Login() {
             </button>
           </form>
 
-          <p className="text-center text-gray-500 text-sm mt-8 font-medium tracking-wide">
+          <p className="text-center text-gray-400 text-sm mt-8 font-medium tracking-wide">
             Don't have an account? <Link to="/register" className="text-yellow-500 hover:text-yellow-400 font-bold ml-1">Register</Link>
           </p>
         </div>
