@@ -409,6 +409,14 @@ function SettingsManager({ data, updateScreenData }: any) {
             <ToggleRow label="Garis Pemisah Header" valueKey="showHeaderDivider" />
             
             <div className="md:col-span-2 p-4 bg-slate-900 rounded-xl border border-slate-800 mt-2">
+              <label className="block text-sm font-semibold text-slate-300 mb-2">Fungsi Kotak Kanan (Sidebar)</label>
+              <select value={settings.textMode || 'news'} onChange={e => set('textMode', e.target.value)} className="w-full bg-slate-950 border border-slate-800 text-white p-3 rounded-xl outline-none focus:border-blue-500">
+                <option value="news">Teks Berita Terkini</option>
+                <option value="playlist">Daftar Playlist Video/Media</option>
+              </select>
+            </div>
+
+            <div className="md:col-span-2 p-4 bg-slate-900 rounded-xl border border-slate-800 mt-2">
               <label className="block text-sm font-semibold text-slate-300 mb-2">Skala / Ukuran Media Video</label>
               <select value={settings.mediaFit || 'contain'} onChange={e => set('mediaFit', e.target.value)} className="w-full bg-slate-950 border border-slate-800 text-white p-3 rounded-xl outline-none focus:border-blue-500">
                 <option value="contain">Contain (Terlihat Semua, ada ruang hitam)</option>

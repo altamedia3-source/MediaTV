@@ -403,7 +403,7 @@ function DisplayContent() {
           )}
         </div>
 
-        {/* Right Sidebar (News) */}
+        {/* Right Sidebar (News or Playlist) */}
         {settings.showNews && (
           <div className="w-[350px] shrink-0 bg-[#0b1426] rounded-xl border border-blue-900/50 p-6 flex flex-col overflow-hidden shadow-[0_0_15px_rgba(0,0,0,0.5)] relative">
             {settings.showBorderAnimation !== false && settings.beamShowNews !== false && (
@@ -418,17 +418,52 @@ function DisplayContent() {
               className="font-bold text-xl mb-4 tracking-wider uppercase flex items-center gap-3 shrink-0 border-b border-blue-800/50 pb-3 z-10"
               style={{ color: settings.newsTitleColor || '#ffffff' }}
             >
-              <span className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span>
-              {settings.newsTitle || 'Berita Terkini'}
+              {settings.textMode === 'playlist' ? (
+                 <><Play className="w-5 h-5" style={{color: settings.beamColor || '#38bdf8'}} /> DAFTAR PUTAR</>
+              ) : (
+                <><span className="w-3 h-3 bg-red-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(239,68,68,0.8)]"></span> {settings.newsTitle || 'Berita Terkini'}</>
+              )}
             </h3>
             <div className="flex-1 overflow-hidden z-10">
-              <SelfWritingNews 
-                newsList={newsTexts}
-                textColor={settings.newsTextColor || '#e2e8f0'}
-                speed={settings.quillSpeed || 'normal'}
-                readingDuration={settings.quillReadingDuration || 6}
-                enableAnimation={settings.enableQuillAnimation !== false}
-              />
+              {settings.textMode === 'playlist' ? (
+                <div className="h-full overflow-y-auto pr-2 space-y-2 custom-scrollbar">
+                  {mediaList.map((m, idx) => (
+                    <div 
+                      key={m.id} 
+                      className={`p-3 rounded-lg border transition-all ${
+                        idx === currentIndex 
+                        ? 'bg-blue-900/40 border-blue-500 shadow-[0_0_10px_rgba(59,130,246,0.3)]' 
+                        : 'bg-slate-900/40 border-slate-800 opacity-60'
+                      }`}
+                    >
+                      <div className="flex items-center gap-3">
+                        <div className={`w-8 h-8 rounded bg-slate-950 flex items-center justify-center shrink-0 ${idx === currentIndex ? 'text-blue-400' : 'text-slate-500'}`}>
+                          {idx === currentIndex ? <Play className="w-4 h-4 fill-current" /> : (idx + 1)}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className={`font-semibold truncate text-sm ${idx === currentIndex ? 'text-white' : 'text-slate-400'}`}>
+                            {m.name || 'Tanpa Judul'}
+                          </p>
+                          <p className="text-[10px] text-slate-500 uppercase mt-0.5">
+                            {m.externalUrl?.startsWith('localdb://') ? 'File Lokal' : 'Link Web'} • {m.type === 'video' ? 'Video' : 'Gambar'}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                  {mediaList.length === 0 && (
+                     <div className="text-center text-slate-500 py-10 text-sm italic">Belum ada media di playlist</div>
+                  )}
+                </div>
+              ) : (
+                <SelfWritingNews 
+                  newsList={newsTexts}
+                  textColor={settings.newsTextColor || '#e2e8f0'}
+                  speed={settings.quillSpeed || 'normal'}
+                  readingDuration={settings.quillReadingDuration || 6}
+                  enableAnimation={settings.enableQuillAnimation !== false}
+                />
+              )}
             </div>
           </div>
         )}

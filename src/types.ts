@@ -42,6 +42,7 @@ export interface AppSettings {
   headerAlignment?: 'left' | 'center' | 'right';
   fontFamily?: string;
   newsTitle?: string;
+  textMode?: 'news' | 'playlist';
   mediaFit?: 'contain' | 'cover';
   institutionNameColor?: string;
   institutionAddressColor?: string;

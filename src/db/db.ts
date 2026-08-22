@@ -40,6 +40,7 @@ export const defaultSettings: AppSettings = {
   headerAlignment: 'center',
   fontFamily: 'sans',
   newsTitle: 'BERITA TERKINI',
+  textMode: 'news',
   mediaFit: 'contain',
   institutionNameColor: '#ffffff',
   institutionAddressColor: '#cbd5e1',
