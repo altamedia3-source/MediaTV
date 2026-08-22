@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { useNavigate, Link } from 'react-router';
 import { signInWithEmailAndPassword, sendPasswordResetEmail } from 'firebase/auth';
 import { auth } from '../lib/firebase';
-import { Monitor, Lock, Mail } from 'lucide-react';
+import lampImage from '../assets/images/white_desk_lamp_3d_1787417396475.jpg';
 
 export default function Login() {
   const [email, setEmail] = useState('');
@@ -47,65 +47,69 @@ export default function Login() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4 font-sans">
-      <div className="bg-slate-900 p-8 rounded-3xl border border-slate-800 w-full max-w-md shadow-2xl">
-        <div className="flex flex-col items-center mb-8">
-          <div className="w-16 h-16 bg-blue-900/30 rounded-2xl flex items-center justify-center mb-4 border border-blue-500/20">
-            <Monitor className="w-8 h-8 text-blue-400" />
-          </div>
-          <h1 className="text-2xl font-bold text-white text-center">Masuk ke MediaTV</h1>
-          <p className="text-slate-400 text-sm mt-2">Kelola layar TV Anda dari mana saja</p>
+    <div className="min-h-screen bg-[#1c1c1c] flex items-center justify-center p-4 font-sans">
+      <div className="flex flex-col md:flex-row items-center gap-12 md:gap-24 w-full max-w-5xl justify-center">
+        
+        {/* Left Side: Lamp Image */}
+        <div className="hidden md:flex flex-col items-center justify-center w-1/2">
+          <img 
+            src={lampImage} 
+            alt="Lamp" 
+            className="w-full max-w-[400px] object-contain mix-blend-screen opacity-90 rounded-[40px]"
+          />
         </div>
 
-        {error && <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-xl text-sm mb-6">{error}</div>}
-        {success && <div className="bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 p-3 rounded-xl text-sm mb-6">{success}</div>}
-
-        <form onSubmit={handleLogin} className="space-y-4">
-          <div>
-            <label className="text-sm text-slate-300 font-semibold mb-1 block">Email</label>
-            <div className="relative">
-              <Mail className="w-5 h-5 text-slate-500 absolute left-4 top-3.5" />
+        {/* Right Side: Login Card */}
+        <div className="bg-[#242424] p-10 rounded-[32px] w-full max-w-md shadow-2xl">
+          <h1 className="text-3xl font-extrabold text-white text-center mb-10 tracking-wide">Welcome</h1>
+          
+          {error && <div className="bg-red-500/10 border border-red-500/50 text-red-400 p-3 rounded-xl text-sm mb-6">{error}</div>}
+          {success && <div className="bg-emerald-500/10 border border-emerald-500/50 text-emerald-400 p-3 rounded-xl text-sm mb-6">{success}</div>}
+          
+          <form onSubmit={handleLogin} className="space-y-6">
+            <div>
+              <label className="text-[13px] text-slate-400 font-bold mb-2 block">Email</label>
               <input 
                 type="email" required
                 value={email} onChange={e => setEmail(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors"
-                placeholder="nama@email.com"
+                className="w-full px-5 py-4 bg-[#181818] border border-transparent rounded-2xl text-white focus:outline-none focus:border-[#ebd08a]/50 transition-colors placeholder:text-slate-600 text-sm"
+                placeholder="Enter Email"
               />
             </div>
-          </div>
-          <div>
-            <div className="flex justify-between items-center mb-1">
-              <label className="text-sm text-slate-300 font-semibold">Kata Sandi</label>
-              <button 
-                type="button" 
-                onClick={handleResetPassword} 
-                disabled={resetting}
-                className="text-xs text-blue-400 hover:text-blue-300 transition-colors"
-              >
-                {resetting ? 'Mengirim...' : 'Lupa Kata Sandi?'}
-              </button>
-            </div>
-            <div className="relative">
-              <Lock className="w-5 h-5 text-slate-500 absolute left-4 top-3.5" />
+            
+            <div>
+              <div className="flex justify-between items-center mb-2">
+                <label className="text-[13px] text-slate-400 font-bold block">Password</label>
+                <button 
+                   type="button" 
+                   onClick={handleResetPassword} 
+                   disabled={resetting}
+                  className="text-xs text-slate-500 hover:text-[#ebd08a] transition-colors font-medium"
+                >
+                  {resetting ? 'Sending...' : 'Forgot?'}
+                </button>
+              </div>
               <input 
                 type="password" required
                 value={password} onChange={e => setPassword(e.target.value)}
-                className="w-full pl-11 pr-4 py-3 bg-slate-950 border border-slate-700 rounded-xl text-white focus:outline-none focus:border-blue-500 transition-colors"
-                placeholder="••••••••"
+                className="w-full px-5 py-4 bg-[#181818] border border-transparent rounded-2xl text-white focus:outline-none focus:border-[#ebd08a]/50 transition-colors placeholder:text-slate-600 text-sm"
+                placeholder="Enter Password"
               />
             </div>
-          </div>
-          <button 
-            type="submit" disabled={loading}
-            className="w-full bg-blue-600 hover:bg-blue-500 disabled:opacity-50 text-white font-bold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/20 mt-4"
-          >
-            {loading ? 'Memproses...' : 'Masuk'}
-          </button>
-        </form>
 
-        <p className="text-center text-slate-400 text-sm mt-6">
-          Belum punya akun? <Link to="/register" className="text-blue-400 hover:text-blue-300 font-semibold">Daftar di sini</Link>
-        </p>
+            <button 
+              type="submit" disabled={loading}
+              className="w-full bg-[#ebd08a] hover:bg-[#d9bc74] disabled:opacity-50 text-black font-extrabold py-4 rounded-2xl transition-all mt-4 text-[15px]"
+            >
+              {loading ? 'Processing...' : 'Sign In'}
+            </button>
+          </form>
+
+          <p className="text-center text-slate-500 text-sm mt-8 font-medium">
+            Don't have an account? <Link to="/register" className="text-[#ebd08a] hover:text-[#d9bc74]">Register</Link>
+          </p>
+        </div>
+        
       </div>
     </div>
   );
