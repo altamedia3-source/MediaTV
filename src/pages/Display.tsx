@@ -22,7 +22,6 @@ function DisplayContent() {
   const [currentMediaUrl, setCurrentMediaUrl] = useState<string>('');
   const [isPlaying, setIsPlaying] = useState(false);
   const [needsInteraction, setNeedsInteraction] = useState(true);
-  const [time, setTime] = useState(new Date());
 
   const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
   const [selectedAudioDevice, setSelectedAudioDevice] = useState<string>('');
@@ -60,12 +59,8 @@ function DisplayContent() {
       }
     };
 
-    // Clock
-    const timer = setInterval(() => setTime(new Date()), 1000);
-
     return () => {
       bc.close();
-      clearInterval(timer);
       if (imageTimerRef.current) clearTimeout(imageTimerRef.current);
     };
   }, []);
@@ -193,19 +188,6 @@ function DisplayContent() {
     (currentMedia.type === 'image' && settings.showImage)
   );
 
-  const formatTime = (date: Date) => {
-    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ' : ');
-  };
-  
-  const formatDate = (date: Date) => {
-    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
-    const dayName = days[date.getDay()];
-    const d = date.getDate().toString().padStart(2, '0');
-    const m = (date.getMonth() + 1).toString().padStart(2, '0');
-    const y = date.getFullYear();
-    return `${dayName}, ${d} / ${m} / ${y}`;
-  };
-
   const getFontClass = (font?: string) => {
     switch (font) {
       case 'serif': return 'font-serif';
@@ -311,28 +293,7 @@ function DisplayContent() {
                 beamCount={1}
               />
             )}
-            {settings.clockStyle !== 'classic' ? (
-              <div className="z-10 flex flex-col items-center py-0.5">
-                <Clock3D 
-                  time={time} 
-                  color={settings.clockColor || '#ffffff'} 
-                  showSeconds={!!settings.showSeconds}
-                />
-              </div>
-            ) : (
-              <div 
-                className="font-bold text-4xl tracking-widest leading-none drop-shadow-md z-10"
-                style={{ color: settings.clockColor || '#ffffff' }}
-              >
-                {formatTime(time)}
-              </div>
-            )}
-            <div 
-              className="text-sm mt-1.5 font-medium tracking-wide z-10 text-center uppercase"
-              style={{ color: settings.dateColor || '#cbd5e1' }}
-            >
-              {formatDate(time)}
-            </div>
+            <LiveClock settings={settings} />
           </div>
         </div>
       )}
@@ -560,6 +521,55 @@ function MonitorIcon(props: any) {
       <line x1="8" x2="16" y1="21" y2="21" />
       <line x1="12" x2="12" y1="17" y2="21" />
     </svg>
+  );
+}
+
+function LiveClock({ settings }: { settings: any }) {
+  const [time, setTime] = useState(new Date());
+
+  useEffect(() => {
+    const timer = setInterval(() => setTime(new Date()), 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit', second: '2-digit' }).replace(/\./g, ' : ');
+  };
+  
+  const formatDate = (date: Date) => {
+    const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+    const dayName = days[date.getDay()];
+    const d = date.getDate().toString().padStart(2, '0');
+    const m = (date.getMonth() + 1).toString().padStart(2, '0');
+    const y = date.getFullYear();
+    return `${dayName}, ${d} / ${m} / ${y}`;
+  };
+
+  return (
+    <>
+      {settings.clockStyle !== 'classic' ? (
+        <div className="z-10 flex flex-col items-center py-0.5">
+          <Clock3D 
+            time={time} 
+            color={settings.clockColor || '#ffffff'} 
+            showSeconds={!!settings.showSeconds}
+          />
+        </div>
+      ) : (
+        <div 
+          className="font-bold text-4xl tracking-widest leading-none drop-shadow-md z-10"
+          style={{ color: settings.clockColor || '#ffffff' }}
+        >
+          {formatTime(time)}
+        </div>
+      )}
+      <div 
+        className="text-sm mt-1.5 font-medium tracking-wide z-10 text-center uppercase"
+        style={{ color: settings.dateColor || '#cbd5e1' }}
+      >
+        {formatDate(time)}
+      </div>
+    </>
   );
 }
 
